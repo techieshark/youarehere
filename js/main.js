@@ -21,6 +21,17 @@ $(document).ready(function() {
         FB.init({
           appId: '550788961695418',
         });
+        FB.login(function() {
+            // FB.api(path, method (default: get), params, callback);
+            FB.api("/search",
+                {type: 'place', center: '33.378766,-111.86182', distance: '1000'},
+                function(response) { console.log(response); }
+            );
+        });
+
+        // later: only run this after we have both location and facebook api (maybe we
+        // can assume that getting the fb api takes no-little time?)
+        //search?type=place&center=33.378776,-111.861823&distance=1000&access_token
     });
 
     // What is the user's location?
