@@ -112,6 +112,7 @@ function fbhours_to_string(hours) {
 /* converts facebook place to simple view (returned) for mustache */
 function fbplace_to_view(place) {
     var view = {
+        id: place.id,
         name: place.name,
         address: place.location.street,
         checkins: place.checkins,
@@ -132,32 +133,50 @@ function htmlprint(spot) {
 
     // query for specific details for each place so we can show more info.
     FB.api("/" + spot.id,
-            function(place) {
-                console.log(place.phone + ',' + place.website + ',' + place.about);
-                console.log(place);
+        function(place) {
+            console.log(place.phone + ',' + place.website + ',' + place.about);
+            console.log(place);
 
-                // place_out(place, 'address');
+            // place_out(place, 'address');
 
-                var template =
-                    '<div class="col-sm-6 col-md-4">' +
-                        '<div class="thumbnail" id="{{id}}">' +
-                            '<img src="http://placekitten.com/300/200" alt="...">' +
-                            '<div class="caption">' +
-                                '<h3>{{name}}</h3>' +
-                                '<p class="place-address">{{address}}</p>' +
-                                '<p class="place-phone">{{phone}}</p>' +
-                                '<p class="place-hours">{{hours}}</p>' +
-                                '<p class="place-about">{{about}}</p>' +
-                                '<p class="place-food">{{foods}}</p>' +
-                            '</div>' +
+            var template =
+                '<div class="col-sm-6 col-md-4">' +
+                    '<div class="thumbnail" id="{{id}}">' +
+                        '<img src="http://placekitten.com/300/200" alt="...">' +
+                        '<div class="caption">' +
+                            '<h3>{{name}}</h3>' +
+                            '<p class="place-address">{{address}}</p>' +
+                            '<p class="place-phone">{{phone}}</p>' +
+                            '<p class="place-hours">{{hours}}</p>' +
+                            '<p class="place-about">{{about}}</p>' +
+                            '<p class="place-food">{{foods}}</p>' +
                         '</div>' +
-                    '</div>';
+                    '</div>' +
+                '</div>';
 
-                $('#' + spot.id).replaceWith(
-                    Mustache.render(template, fbplace_to_view(place))
-                );
+            $('#' + spot.id).replaceWith(
+                Mustache.render(template, fbplace_to_view(place))
+            );
 
-            });
+            // now that the textual content has been rendered, we can add a photo to it.
+            FB.api("/" + spot.id + "/photos",
+                function(place) {
+                    //https://developers.facebook.com/tools/explorer/145634995501895/?method=GET&path=84554169003%2Fphotos
+                    //get a reasonably sized image
+                    //assume first image is the one we want.
+
+                    if (place.data && place.data.length > 0 && place.data[0].images) {
+                        // var firstpics = _.first(place.data[0].images, function(image) {
+                        //     return image.height >= 200 && image.height <= 500;
+                        //     // return true;
+                        // });
+
+                        $('#' + spot.id + ' img').attr('src', place.data[0].images[0].source);
+                    } // else if no data, we can't do much, now can we? other than random cat pics.
+
+                });
+        });
+
 
     // print the item (and include ID so we can add to it later).
 
@@ -238,8 +257,8 @@ $(document).ready(function() {
     $.ajaxSetup({ cache: true });
     $.getScript('//connect.facebook.net/en_US/all.js', function(){
         FB.init({
-          appId: '550788961695418',
-          // appId: '612274872174090', // localhost dev ID
+          // appId: '550788961695418',
+          appId: '612274872174090', // localhost dev ID
         });
 
 
