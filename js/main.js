@@ -257,8 +257,8 @@ $(document).ready(function() {
     $.ajaxSetup({ cache: true });
     $.getScript('//connect.facebook.net/en_US/all.js', function(){
         FB.init({
-          // appId: '550788961695418',
-          appId: '612274872174090', // localhost dev ID
+          appId: '550788961695418',
+          // appId: '612274872174090', // localhost dev ID
         });
 
 
